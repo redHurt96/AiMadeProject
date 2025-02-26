@@ -1,30 +1,38 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 namespace TowerDefense
 {
     public class Projectile : MonoBehaviour
     {
         [SerializeField] private float _speed = 10f;
-        private Vector3 _targetPosition; // Точка назначения
+        [SerializeField] private float _lifetime = 5f; // Время жизни снаряда в секундах
+        private Vector3 _targetPosition;
 
         public void Initialize(Vector3 targetPosition)
         {
             _targetPosition = targetPosition;
+            StartCoroutine(DestroyAfterLifetime()); // Запускаем корутину при инициализации
         }
 
         private void Update()
         {
-            // Двигаем снаряд к целевой точке
+            // Движение к цели
             if (_targetPosition != null)
             {
                 transform.position = Vector3.MoveTowards(transform.position, _targetPosition, _speed * Time.deltaTime);
 
-                // Если снаряд достиг цели, уничтожаем его
                 if (transform.position == _targetPosition)
                 {
                     Destroy(gameObject);
                 }
             }
+        }
+
+        private IEnumerator DestroyAfterLifetime()
+        {
+            yield return new WaitForSeconds(_lifetime); // Ждем указанное время
+            Destroy(gameObject); // Уничтожаем снаряд
         }
     }
 }

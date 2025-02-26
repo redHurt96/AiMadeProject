@@ -2,17 +2,17 @@
 
 namespace TowerDefense
 {
+    [RequireComponent(typeof(TowerAttack))]
     public class Tower : MonoBehaviour
     {
         [SerializeField] private float _health = 100f;
-        [SerializeField] private TowerAttack _towerAttack; // Ссылка на компонент TowerAttack
+        [SerializeField] private TowerAttack _towerAttack;
 
         public delegate void TowerDestroyed();
         public event TowerDestroyed OnTowerDestroyed;
 
         private void Start()
         {
-            // Убедитесь, что TowerAttack добавлен через инспектор или автоматически
             if (_towerAttack == null)
                 _towerAttack = GetComponent<TowerAttack>();
         }
@@ -28,8 +28,14 @@ namespace TowerDefense
 
         private void DestroyTower()
         {
-            OnTowerDestroyed?.Invoke(); // Вызываем событие уничтожения башни
-            Destroy(gameObject);
+            OnTowerDestroyed?.Invoke();
+            gameObject.SetActive(false); // Деактивируем вместо уничтожения
+            // Destroy(gameObject); // Убираем полное уничтожение
+        }
+
+        public void ResetHealth()
+        {
+            _health = 100f; // Сбрасываем здоровье для нового уровня
         }
     }
 }
