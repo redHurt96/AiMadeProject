@@ -8,6 +8,7 @@ namespace TowerDefense
         [SerializeField] private float _attackRange = 3f;
         [SerializeField] private float _attackDamage = 10f;
         [SerializeField] private float _health = 100f;
+        [SerializeField] private float _range = 2f;
 
         private Transform[] _waypoints;
         private Tower _tower; // Ссылка на одну башню
@@ -42,7 +43,18 @@ namespace TowerDefense
         {
             if (_waypoints.Length == 0 || _currentWaypointIndex >= _waypoints.Length) return;
 
-            float distance = Vector3.Distance(transform.position, _waypoints[_currentWaypointIndex].position);
+            Vector3 currentWaypointPosition = _waypoints[_currentWaypointIndex].position;
+    
+            // If we're starting movement towards a new waypoint, calculate random offset
+            if (Vector3.Distance(transform.position, currentWaypointPosition) >= _moveSpeed)
+            {
+                float randomOffsetX = Random.Range(-_range, _range);
+                float randomOffsetZ = Random.Range(-_range, _range);
+                Vector3 randomOffset = new Vector3(randomOffsetX, 0f, randomOffsetZ);
+                currentWaypointPosition += randomOffset;
+            }
+
+            float distance = Vector3.Distance(transform.position, currentWaypointPosition);
 
             if (distance < 0.1f)
             {
@@ -51,7 +63,7 @@ namespace TowerDefense
 
             if (_currentWaypointIndex < _waypoints.Length)
             {
-                transform.position = Vector3.MoveTowards(transform.position, _waypoints[_currentWaypointIndex].position, _moveSpeed * Time.deltaTime);
+                transform.position = Vector3.MoveTowards(transform.position, currentWaypointPosition, _moveSpeed * Time.deltaTime);
             }
         }
 
